@@ -161,3 +161,6 @@
 [submodule "bundle/vim-javascript-syntax"]
 	path = bundle/vim-javascript-syntax
 	url = https://github.com/jelera/vim-javascript-syntax
+[submodule "bundle/vim-multiple-cursors"]
+	path = bundle/vim-multiple-cursors
+	url = git://github.com/terryma/vim-multiple-cursors.git

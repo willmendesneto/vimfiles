@@ -179,3 +179,6 @@
 [submodule "bundle/emmet-vim"]
 	path = bundle/emmet-vim
 	url = git://github.com/mattn/emmet-vim.git
+[submodule "bundle/jedi-vim"]
+	path = bundle/jedi-vim
+	url = git://github.com/davidhalter/jedi-vim.git

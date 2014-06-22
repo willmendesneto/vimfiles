@@ -164,3 +164,6 @@
 [submodule "bundle/vim-multiple-cursors"]
 	path = bundle/vim-multiple-cursors
 	url = git://github.com/terryma/vim-multiple-cursors.git
+[submodule "bundle/browser-refresh.vim"]
+	path = bundle/browser-refresh.vim
+	url = https://github.com/mkitt/browser-refresh.vim.git

@@ -29,3 +29,6 @@
 [submodule "bundle/markdown"]
 	path = bundle/markdown
 	url = git://github.com/tpope/vim-markdown.git
+[submodule "bundle/vividchalk"]
+	path = bundle/vividchalk
+	url = git://github.com/tpope/vim-vividchalk.git

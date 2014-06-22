@@ -1,175 +1,80 @@
 " loads unbundle plugin
 :runtime bundle/vim-unbundle/unbundle.vim
 
-" Disable vi compatibility
+"avoiding annoying CSApprox warning message
+let g:CSApprox_verbose_level = 0
+
+"necessary on some Linux distros for pathogen to properly load bundles
+filetype on
+filetype off
+
+"load pathogen managed plugins
+call pathogen#infect()
+
+"Use Vim settings, rather then Vi settings (much better!).
+"This must be first, because it changes other options as a side effect.
 set nocompatible
 
-" Use Pathogen to load bundles
-execute pathogen#infect()
-
-"  ---------------------------------------------------------------------------
-"  General
-"  ---------------------------------------------------------------------------
-
-filetype plugin indent on           " Automatically detect file types.let mapleader = ","
-let g:mapleader = ","               " Change mapleader
-
-set modeline                        " Respect modeline in files
-set modelines=3
-
-set history=1000                    " Store a ton of history (default is 20)
-syntax on                           " Syntax highlighting
-set autoread                        " Update an open file edited outside of Vim
-set autowrite                       " Automatically :write before running commands
-set shell=bash                      " Run RVM inside VIM
-set ttyfast                         " Optimize for fast terminal connections
-
-
-"  ---------------------------------------------------------------------------
-"  UI
-"  ---------------------------------------------------------------------------
-
-set title                                  " Show the filename in the window titlebar
-set encoding=utf-8                         " Use UTF-8
-set scrolloff=3                            " Start scrolling three lines before the horizontal window border
-set autoindent
-set smartindent
-set showmode                               " Show the current mode
-set tabpagemax=15                          " Only show 15 tabs
-set hidden
-set wildmenu                               " Show list instead of just completing
-set wildmode=list:longest,full             " Command <Tab> completion, list matches, then longest common part, then all.
-
-set novisualbell                           " No blinking
-set noerrorbells                           " No noise
-
-if has("gui_running")
-    set go-=T                              " hide the toolbar
-    set go-=m                              " hide the menu
-    set go-=rRlLbh                         " hide all the scrollbars
-    set mouse=a                            " Automatically enable mouse usage
-    set mousehide                          " Hide the mouse cursor while typing
-endif
-
+"allow backspacing over everything in insert mode
 set backspace=indent,eol,start
-set undofile
 
-set splitbelow splitright                  " Open new split panes to right and bottom, which feels more natural
+"store lots of :cmdline history
+set history=1000
 
-set number                                 " Line numbers on
-set numberwidth=5
+set showcmd     "show incomplete cmds down the bottom
+set showmode    "show current mode down the bottom
 
-set cursorline
-set ruler                                            " Show the ruler
-set rulerformat=%30(%=\:b%n%y%m%r%w\ %l,%c%V\ %P%)   " A ruler on steroids
-set showcmd                                          " Show partial commands in status line and
-                                                     " selected characters/lines in visual mode
+set incsearch   "find the next match as we type the search
+set hlsearch    "hilight searches by default
 
-set foldenable                                       " Turn on folding
-set foldmethod=marker                                " Fold on the marker
-set foldlevel=100                                    " Don't autofold anything (but I can still fold manually)
+set number      "add line numbers
+set showbreak=...
+set wrap linebreak nolist
 
-set foldopen=block,hor,tag                           " what movements open folds
-set foldopen+=percent,mark
-set foldopen+=quickfix
-
-set list
-set listchars=tab:›\ ,trail:•,extends:#,nbsp:.       " Highlight problematic whitespace
-set hlsearch                                         " Highlight searches
-set ignorecase                                       " Ignore case of searches
-set incsearch                                        " Highlight dynamically as pattern is typed
-
-set lines=50 columns=180                             " Auto adjust window sizes when they become current
-
-colorscheme molokai                                  " Theme and Font Settings
-set guifont=Menlo:h14
-set t_Co=256
+"mapping for command key to map navigation thru display lines instead
+"of just numbered lines
+vmap <D-j> gj
+vmap <D-k> gk
+vmap <D-4> g$
+vmap <D-6> g^
+vmap <D-0> g^
+nmap <D-j> gj
+nmap <D-k> gk
+nmap <D-4> g$
+nmap <D-6> g^
+nmap <D-0> g^
 
 "add some line space for easy reading
-set linespace=4
+set linespace=2
 
+"disable visual bell
+set visualbell t_vb=
 
-"  ---------------------------------------------------------------------------
-"  Directories - Centralize backups, swapfiles and undo history
-"  ---------------------------------------------------------------------------
-
-set backupdir=~/.vim/backups
-set directory=~/.vim/swaps
-if exists("&undodir")
-    set undodir=~/.vim/undo
-endif
-
-
-"  ---------------------------------------------------------------------------
-"  Text Formatting
-"  ---------------------------------------------------------------------------
-
-set tabstop=2                     " Make tabs as wide as four spaces
-set shiftwidth=2
-set softtabstop=2
-set expandtab
-
-set textwidth=80
-set formatoptions=n
-
-"  ---------------------------------------------------------------------------
-"  Status Line
-"  ---------------------------------------------------------------------------
+"try to make possible to navigate within lines of wrapped lines
+nmap <Down> gj
+nmap <Up> gk
+set fo=l
 
 "statusline setup
-set statusline =%#identifier#
-set statusline+=[%t]    "tail of the filename
-set statusline+=%*
+set statusline=%f       "tail of the filename
 
-"display a warning if fileformat isnt unix
-set statusline+=%#warningmsg#
-set statusline+=%{&ff!='unix'?'['.&ff.']':''}
-set statusline+=%*
-
-"display a warning if file encoding isnt utf-8
-set statusline+=%#warningmsg#
-set statusline+=%{(&fenc!='utf-8'&&&fenc!='')?'['.&fenc.']':''}
-set statusline+=%*
-
-set statusline+=%h      "help file flag
-set statusline+=%y      "filetype
-
-"read only flag
-set statusline+=%#identifier#
-set statusline+=%r
-set statusline+=%*
-
-"modified flag
-set statusline+=%#identifier#
-set statusline+=%m
-set statusline+=%*
-
+"Git
 set statusline+=%{fugitive#statusline()}
 
-"display a warning if &et is wrong, or we have mixed-indenting
-set statusline+=%#error#
-set statusline+=%{StatuslineTabWarning()}
-set statusline+=%*
-
-set statusline+=%{StatuslineTrailingSpaceWarning()}
-
-set statusline+=%{StatuslineLongLineWarning()}
-
-set statusline+=%#warningmsg#
-set statusline+=%{SyntasticStatuslineFlag()}
-set statusline+=%*
-
-"display a warning if &paste is set
-set statusline+=%#error#
-set statusline+=%{&paste?'[paste]':''}
-set statusline+=%*
+"RVM
+set statusline+=%{exists('g:loaded_rvm')?rvm#statusline():''}
 
 set statusline+=%=      "left/right separator
-set statusline+=%{StatuslineCurrentHighlight()}\ \ "current highlight
 set statusline+=%c,     "cursor column
 set statusline+=%l/%L   "cursor line/total lines
 set statusline+=\ %P    "percent through file
 set laststatus=2
+
+"turn off needless toolbar on gvim/mvim
+set guioptions-=T
+"turn off the scroll bar
+set guioptions-=L
+set guioptions-=r
 
 "recalculate the trailing whitespace warning when idle, and after saving
 autocmd cursorhold,bufwritepost * unlet! b:statusline_trailing_space_warning
@@ -178,12 +83,6 @@ autocmd cursorhold,bufwritepost * unlet! b:statusline_trailing_space_warning
 "return '' otherwise
 function! StatuslineTrailingSpaceWarning()
     if !exists("b:statusline_trailing_space_warning")
-
-        if !&modifiable
-            let b:statusline_trailing_space_warning = ''
-            return b:statusline_trailing_space_warning
-        endif
-
         if search('\s\+$', 'nw') != 0
             let b:statusline_trailing_space_warning = '[\s]'
         else
@@ -212,21 +111,15 @@ autocmd cursorhold,bufwritepost * unlet! b:statusline_tab_warning
 "return an empty string if everything is fine
 function! StatuslineTabWarning()
     if !exists("b:statusline_tab_warning")
-        let b:statusline_tab_warning = ''
-
-        if !&modifiable
-            return b:statusline_tab_warning
-        endif
-
         let tabs = search('^\t', 'nw') != 0
-
-        "find spaces that arent used as alignment in the first indent column
-        let spaces = search('^ \{' . &ts . ',}[^\t]', 'nw') != 0
+        let spaces = search('^ ', 'nw') != 0
 
         if tabs && spaces
             let b:statusline_tab_warning =  '[mixed-indenting]'
         elseif (spaces && !&et) || (tabs && &et)
             let b:statusline_tab_warning = '[&et]'
+        else
+            let b:statusline_tab_warning = ''
         endif
     endif
     return b:statusline_tab_warning
@@ -244,12 +137,6 @@ autocmd cursorhold,bufwritepost * unlet! b:statusline_long_line_warning
 "longest line
 function! StatuslineLongLineWarning()
     if !exists("b:statusline_long_line_warning")
-
-        if !&modifiable
-            let b:statusline_long_line_warning = ''
-            return b:statusline_long_line_warning
-        endif
-
         let long_line_lens = s:LongLines()
 
         if len(long_line_lens) > 0
@@ -264,167 +151,305 @@ function! StatuslineLongLineWarning()
     return b:statusline_long_line_warning
 endfunction
 
-"  ---------------------------------------------------------------------------
-"  Mappings
-"  ---------------------------------------------------------------------------
+"return a list containing the lengths of the long lines in this buffer
+function! s:LongLines()
+    let threshold = (&tw ? &tw : 80)
+    let spaces = repeat(" ", &ts)
 
-" Saving and exit
-nmap <leader>q :wqa!<CR>
-nmap <leader>w :w!<CR>
-nmap <leader><Esc> :q!<CR>
+    let long_line_lens = []
 
-" Save a file as root (,W)
-noremap <leader>W :w !sudo tee % > /dev/null<CR>
+    let i = 1
+    while i <= line("$")
+        let len = strlen(substitute(getline(i), '\t', spaces, 'g'))
+        if len > threshold
+            call add(long_line_lens, len)
+        endif
+        let i += 1
+    endwhile
 
-" Opens files in directory of current file
-cnoremap %% <C-R>=expand('%:h').'/'<cr>
-map <leader>e :edit %%
-map <leader>v :view %%
+    return long_line_lens
+endfunction
 
-noremap <leader>ss :call StripWhitespace()<CR>
+"find the median of the given array of numbers
+function! s:Median(nums)
+    let nums = sort(a:nums)
+    let l = len(nums)
 
-
-"  ---------------------------------------------------------------------------
-"  Helpers
-"  ---------------------------------------------------------------------------
-
-function! MakeDirIfNoExists(path)
-    if !isdirectory(expand(a:path))
-        call mkdir(expand(a:path), "p")
+    if l % 2 == 1
+        let i = (l-1) / 2
+        return nums[i]
+    else
+        return (nums[l/2] + nums[(l/2)-1]) / 2
     endif
 endfunction
 
-" Rename current file
-function! RenameFile()
-    let old_name = expand('%')
-    let new_name = input('New file name: ', expand('%'), 'file')
-    if new_name != '' && new_name != old_name
-        exec ':saveas ' . new_name
-        exec ':silent !rm ' . old_name
-        redraw!
+"indent settings
+set tabstop=2
+set shiftwidth=2
+set softtabstop=2
+set expandtab
+set autoindent
+
+"folding settings
+set foldmethod=indent   "fold based on indent
+set foldnestmax=3       "deepest fold is 3 levels
+set nofoldenable        "dont fold by default
+
+set wildmode=list:longest   "make cmdline tab completion similar to bash
+set wildmenu                "enable ctrl-n and ctrl-p to scroll thru matches
+set wildignore=*.o,*.obj,*~ "stuff to ignore when tab completing
+
+"display tabs and trailing spaces
+"set list
+"set listchars=tab:\ \ ,extends:>,precedes:<
+" disabling list because it interferes with soft wrap
+
+set formatoptions-=o "dont continue comments when pushing o/O
+
+"vertical/horizontal scroll off settings
+set scrolloff=3
+set sidescrolloff=7
+set sidescroll=1
+
+"load ftplugins and indent files
+filetype plugin on
+filetype indent on
+
+"turn on syntax highlighting
+syntax on
+
+"some stuff to get the mouse going in term
+set mouse=a
+set ttymouse=xterm2
+
+"hide buffers when not displayed
+set hidden
+
+"Activate smartcase
+set ic
+set smartcase
+
+if has("gui_running")
+    "tell the term has 256 colors
+    set t_Co=256
+
+    colorscheme molokai
+    set guitablabel=%M%t
+    set lines=40
+    set columns=115
+
+    if has("gui_gnome")
+        set term=gnome-256color
+        colorscheme molokai
+        set guifont=Monospace\ Bold\ 12
+    endif
+
+    if has("gui_mac") || has("gui_macvim")
+        set guifont=Menlo:h12
+        set transparency=7
+    endif
+
+    if has("gui_win32") || has("gui_win32s")
+        set guifont=Consolas:h12
+        set enc=utf-8
+    endif
+else
+    "dont load csapprox if there is no gui support - silences an annoying warning
+    let g:CSApprox_loaded = 1
+
+    "set railscasts colorscheme when running vim in gnome terminal
+    if $COLORTERM == 'gnome-terminal'
+        set term=gnome-256color
+        colorscheme molokai
+    else
+        if $TERM == 'xterm'
+            set term=xterm-256color
+            colorscheme molokai
+        else
+            colorscheme default
+        endif
+    endif
+endif
+
+" PeepOpen uses <Leader>p as well so you will need to redefine it so something
+" else in your ~/.vimrc file, such as:
+" nmap <silent> <Leader>q <Plug>PeepOpen
+
+silent! nmap <silent> <Leader>p :NERDTreeToggle<CR>
+
+"make <c-l> clear the highlight as well as redraw
+nnoremap <C-L> :nohls<CR><C-L>
+inoremap <C-L> <C-O>:nohls<CR>
+
+"map to bufexplorer
+nnoremap <leader>b :BufExplorer<cr>
+"map to bufergator
+let g:buffergator_suppress_keymaps = 1
+nnoremap <leader>bg :BuffergatorToggle<cr>
+
+"disable resizing when calling buffergator
+let g:buffergator_autoexpand_on_split = 0
+
+"map to CommandT TextMate style finder
+nnoremap <leader>t :CommandT<CR>
+
+"map Q to something useful
+noremap Q gq
+
+"make Y consistent with C and D
+nnoremap Y y$
+
+"bindings for ragtag
+inoremap <M-o>       <Esc>o
+inoremap <C-j>       <Down>
+let g:ragtag_global_maps = 1
+
+"mark syntax errors with :signs
+let g:syntastic_enable_signs=1
+
+"key mapping for vimgrep result navigation
+map <A-o> :copen<CR>
+map <A-q> :cclose<CR>
+map <A-j> :cnext<CR>
+map <A-k> :cprevious<CR>
+
+"key mapping for Gundo
+nnoremap <F4> :GundoToggle<CR>
+
+"snipmate setup
+try
+  source ~/.vim/snippets/support_functions.vim
+catch
+  source ~/vimfiles/snippets/support_functions.vim
+endtry
+autocmd vimenter * call s:SetupSnippets()
+function! s:SetupSnippets()
+
+    "if we're in a rails env then read in the rails snippets
+    if filereadable("./config/environment.rb")
+      try
+        call ExtractSnips("~/.vim/snippets/ruby-rails", "ruby")
+        call ExtractSnips("~/.vim/snippets/eruby-rails", "eruby")
+      catch
+        call ExtractSnips("~/vimfiles/snippets/ruby-rails", "ruby")
+        call ExtractSnips("~/vimfiles/snippets/eruby-rails", "eruby")
+      endtry
+    endif
+
+    try
+      call ExtractSnips("~/.vim/snippets/html", "eruby")
+      call ExtractSnips("~/.vim/snippets/html", "xhtml")
+      call ExtractSnips("~/.vim/snippets/html", "php")
+    catch
+      call ExtractSnips("~/vimfiles/snippets/html", "eruby")
+      call ExtractSnips("~/vimfiles/snippets/html", "xhtml")
+      call ExtractSnips("~/vimfiles/snippets/html", "php")
+    endtry
+endfunction
+
+"visual search mappings
+function! s:VSetSearch()
+    let temp = @@
+    norm! gvy
+    let @/ = '\V' . substitute(escape(@@, '\'), '\n', '\\n', 'g')
+    let @@ = temp
+endfunction
+vnoremap * :<C-u>call <SID>VSetSearch()<CR>//<CR>
+vnoremap # :<C-u>call <SID>VSetSearch()<CR>??<CR>
+
+
+"jump to last cursor position when opening a file
+"dont do it when writing a commit log entry
+autocmd BufReadPost * call SetCursorPosition()
+function! SetCursorPosition()
+    if &filetype !~ 'commit\c'
+        if line("'\"") > 0 && line("'\"") <= line("$")
+            exe "normal! g`\""
+            normal! zz
+        endif
+    end
+endfunction
+
+"define :HighlightLongLines command to highlight the offending parts of
+"lines that are longer than the specified length (defaulting to 80)
+command! -nargs=? HighlightLongLines call s:HighlightLongLines('<args>')
+function! s:HighlightLongLines(width)
+    let targetWidth = a:width != '' ? a:width : 79
+    if targetWidth > 0
+        exec 'match Todo /\%>' . (targetWidth) . 'v/'
+    else
+        echomsg "Usage: HighlightLongLines [natural number]"
     endif
 endfunction
-map <leader>n :call RenameFile()<cr>
 
-" Strip trailing whitespace (,ss)
-function! StripWhitespace()
-    let save_cursor = getpos(".")
-    let old_query = getreg('/')
-    :%s/\s\+$//e
-    call setpos('.', save_cursor)
-    call setreg('/', old_query)
+" Strip trailing whitespace
+function! <SID>StripTrailingWhitespaces()
+    " Preparation: save last search, and cursor position.
+    let _s=@/
+    let l = line(".")
+    let c = col(".")
+    " Do the business:
+    %s/\s\+$//e
+    " Clean up: restore previous search history, and cursor position
+    let @/=_s
+    call cursor(l, c)
 endfunction
+autocmd BufWritePre * :call <SID>StripTrailingWhitespaces()
 
+"key mapping for window navigation
+map <C-h> <C-w>h
+map <C-j> <C-w>j
+map <C-k> <C-w>k
+map <C-l> <C-w>l
 
-"  ---------------------------------------------------------------------------
-"  Abbreviations
-"  ---------------------------------------------------------------------------
+"key mapping for saving file
+nmap <C-s> :w<CR>
 
-iabbrev @@    code@vitorbritto.com.br
-iabbrev ccopy Copyright 2014 Vitor Britto. All rights reserved.
+"key mapping for tab navigation
+nmap <S-Tab> gt
+nmap <C-S-Tab> gT
 
+"Key mapping for textmate-like indentation
+nmap <D-[> <<
+nmap <D-]> >>
+vmap <D-[> <gv
+vmap <D-]> >gv
 
-"  ---------------------------------------------------------------------------
-"  Function Keys
-"  ---------------------------------------------------------------------------
+let ScreenShot = {'Icon':0, 'Credits':0, 'force_background':'#FFFFFF'}
 
-" F1 - Terminal
-map <F1> :Terminal<CR>
+"Enabling Zencoding
+let g:user_zen_settings = {
+  \  'php' : {
+  \    'extends' : 'html',
+  \    'filters' : 'c',
+  \  },
+  \  'xml' : {
+  \    'extends' : 'html',
+  \  },
+  \  'haml' : {
+  \    'extends' : 'html',
+  \  },
+  \  'erb' : {
+  \    'extends' : 'html',
+  \  },
+ \}
 
-" F2 - NERDTree
-nnoremap <F2> :NERDTreeToggle<CR>
+" when press { + Enter, the {} block will expand.
+imap {<CR> {}<ESC>i<CR><ESC>O
 
-" F3 - GundoTree
-nnoremap <F3> :GundoToggle<CR>
+" NERDTree settings
+nmap wm :NERDTree<cr>
+let NERDTreeIgnore=['\.swp$']
 
+nnoremap <Esc>A <up>
+nnoremap <Esc>B <down>
+nnoremap <Esc>C <right>
+nnoremap <Esc>D <left>
+inoremap <Esc>A <up>
+inoremap <Esc>B <down>
+inoremap <Esc>C <right>
+inoremap <Esc>D <left>
 
-"  ---------------------------------------------------------------------------
-"  Auto Commands
-"  ---------------------------------------------------------------------------
-
-au vimenter * NERDTree
-
-au BufNewFile *.txt :write
-
-au BufRead,BufNewFile *.md set filetype=markdown
-au FileType markdown setlocal spell                " Enable spellchecking for Markdown
-au BufRead,BufNewFile *.md setlocal textwidth=80   " Automatically wrap at 80 characters for Markdown
-
-au! BufRead,BufNewFile *.sass setfiletype sass
-au BufRead,BufNewFile *.scss set filetype=scss
-au BufNewFile,BufReadPost *.scss setl foldmethod=indent
-au BufNewFile,BufReadPost *.sass setl foldmethod=indent
-
-
-"  ---------------------------------------------------------------------------
-"  Plugins
-"  ---------------------------------------------------------------------------
-
-" NerdTree {
-
-    map <C-n> :NERDTreeToggle<CR>               " Open NERDTree
-    map <C-e> <plug>NERDTreeTabsToggle<CR>      " Toggle tabs
-    map <leader>e :NERDTreeFind<CR>             " NERDTree Find
-    nmap <leader>nt :NERDTreeFind<CR>
-
-    let NERDTreeIgnore=['\.pyc', '\~$', '\.swo$', '\.swp$', '\.git', '\.hg', '\.svn', '\.bzr']
-    let NERDTreeShowBookmarks = 0
-    let NERDChristmasTree = 1
-    let NERDTreeWinPos = "left"
-    let NERDTreeHijackNetrw = 1
-    let NERDTreeQuitOnOpen = 1
-    let NERDTreeWinSize = 30
-    let NERDTreeChDirMode = 2
-    let NERDTreeDirArrows = 1
-    let NERDTreeMouseMode=2
-
-" }
-
-" Synstatic {
-    let g:syntastic_check_on_open = 1             " Check on open as well as save
-    let g:syntastic_error_symbol = '✗'            " Error Symbol
-    let g:syntastic_warning_symbol = '⚠'          " Warning Symbol
-    let g:syntastic_style_error_symbol = '⚡'      " Style Error Symbol
-    let g:syntastic_style_warning_symbol = '⚡'    " Style Warning Symbol
-
-    let g:syntastic_css_checkers = ['csslint']
-    let g:syntastic_javascript_checkers = ['jshint']
-" }
-
-" AirLine {
-    let g:airline_theme='powerlineish'
-    let g:airline_enable_branch = 1
-    let g:airline_powerline_fonts = 1
-    let g:airline_detect_whitespace = 1
-    let g:airline#extensions#hunks#non_zero_only = 1
-" }
-
-" Supertab {
-    " let g:SuperTabDefaultCompletionType = 'context'
-    let g:SuperTabLongestEnhanced = 1
-    let g:SuperTabContextDefaultCompletionType = "<c-x><c-o>"
-" }
-
-" Snipmate {
-    " Tell snipmate to pull it's snippets from a custom directory
-    let g:snippets_dir = '~/.vim/snippets/'
-" }
-
-" Fugitive {
-    nnoremap <silent> <leader>gs :Gstatus<CR>
-    nnoremap <silent> <leader>gd :Gdiff<CR>
-    nnoremap <silent> <leader>gc :Gcommit<CR>
-    nnoremap <silent> <leader>gb :Gblame<CR>
-    nnoremap <silent> <leader>gl :Glog<CR>
-    nnoremap <silent> <leader>gp :Git push<CR>
-    nnoremap <silent> <leader>gr :Gread<CR>
-    nnoremap <silent> <leader>gw :Gwrite<CR>
-    nnoremap <silent> <leader>ge :Gedit<CR>
-    nnoremap <silent> <leader>gi :Git add -p %<CR>
-    nnoremap <silent> <leader>gg :SignifyToggle<CR>
-" }
-
-" Gundo {
-    nnoremap <Leader>u :GundoToggle<CR>
-    let g:gundo_preview_bottom = 1
-" }
+if has("balloon_eval")
+  set noballooneval
+endif

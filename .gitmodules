@@ -101,3 +101,6 @@
 [submodule "bundle/gundo"]
 	path = bundle/gundo
 	url = http://github.com/sjl/gundo.vim.git
+[submodule "bundle/gist-vim"]
+	path = bundle/gist-vim
+	url = http://github.com/mattn/gist-vim.git

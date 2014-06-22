@@ -167,3 +167,6 @@
 [submodule "bundle/browser-refresh.vim"]
 	path = bundle/browser-refresh.vim
 	url = https://github.com/mkitt/browser-refresh.vim.git
+[submodule "bundle/json.vim"]
+	path = bundle/json.vim
+	url = https://github.com/vim-scripts/JSON.vim.git

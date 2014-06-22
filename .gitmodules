@@ -152,3 +152,6 @@
 [submodule "bundle/vim-niji"]
 	path = bundle/vim-niji
 	url = git://github.com/amdt/vim-niji.git
+[submodule "bundle/colorschemes"]
+	path = bundle/colorschemes
+	url = git@github.com:flazz/vim-colorschemes.git

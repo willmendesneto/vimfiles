@@ -191,9 +191,9 @@ set expandtab
 set autoindent
 
 "folding settings
-set foldmethod=indent   "fold based on indent
-set foldnestmax=3       "deepest fold is 3 levels
-set nofoldenable        "dont fold by default
+"set foldmethod=indent   "fold based on indent
+"set foldnestmax=3       "deepest fold is 3 levels
+"set nofoldenable        "dont fold by default
 
 set wildmode=list:longest   "make cmdline tab completion similar to bash
 set wildmenu                "enable ctrl-n and ctrl-p to scroll thru matches
@@ -219,7 +219,7 @@ filetype indent on
 syntax on
 
 "some stuff to get the mouse going in term
-set mouse=a
+"# set mouse=a
 set ttymouse=xterm2
 
 "hide buffers when not displayed
@@ -317,11 +317,9 @@ map <A-k> :cprevious<CR>
 nnoremap <F4> :GundoToggle<CR>
 
 "snipmate setup
-try
-  source ~/.vim/snippets/support_functions.vim
-catch
-  source ~/vimfiles/snippets/support_functions.vim
-endtry
+
+source ~/.vim/snippets/support_functions.vim
+
 autocmd vimenter * call s:SetupSnippets()
 function! s:SetupSnippets()
 
